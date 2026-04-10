@@ -13,6 +13,7 @@ com\hostelmanagement\model\LeaveStatus.class
 com\hostelmanagement\repository\AllocationRepository.class
 com\hostelmanagement\service\NotFoundException.class
 com\hostelmanagement\model\Complaint.class
+com\hostelmanagement\dto\Requests$AttendanceSummary.class
 com\hostelmanagement\model\Student.class
 com\hostelmanagement\repository\RoomRepository.class
 com\hostelmanagement\dto\Requests.class
@@ -24,6 +25,8 @@ com\hostelmanagement\model\AttendanceStatus.class
 com\hostelmanagement\dto\Requests$AllocationRequest.class
 com\hostelmanagement\controller\StudentController.class
 com\hostelmanagement\config\DataSeeder.class
+com\hostelmanagement\controller\ReceiptController.class
+com\hostelmanagement\service\ReceiptService.class
 com\hostelmanagement\repository\ApplicationRepository.class
 com\hostelmanagement\repository\BillRepository.class
 com\hostelmanagement\repository\PaymentRepository.class
@@ -32,11 +35,13 @@ com\hostelmanagement\controller\AdminController.class
 com\hostelmanagement\dto\Requests$LoginRequest.class
 com\hostelmanagement\HostelManagementApplication.class
 com\hostelmanagement\model\Admin.class
+com\hostelmanagement\controller\AttendanceController.class
 com\hostelmanagement\model\Warden.class
 com\hostelmanagement\model\BillStatus.class
 com\hostelmanagement\model\ComplaintStatus.class
 com\hostelmanagement\service\BusinessException.class
 com\hostelmanagement\model\Payment.class
+com\hostelmanagement\dto\Requests$LeaveRequestPayload.class
 com\hostelmanagement\repository\ComplaintRepository.class
 com\hostelmanagement\repository\UserRepository.class
 com\hostelmanagement\dto\Requests$RoomRequest.class

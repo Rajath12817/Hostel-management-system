@@ -90,9 +90,15 @@ public class WardenService {
 
     public Attendance markAttendance(Long studentId, LocalDate date, AttendanceStatus status) {
         User student = student(studentId);
+        if (status == null) {
+            throw new BusinessException("Attendance status is required");
+        }
         LocalDate attendanceDate = date == null ? LocalDate.now() : date;
         Attendance attendance = attendanceRepository.findByStudentIdAndAttendanceDate(studentId, attendanceDate)
                 .orElseGet(Attendance::new);
+        if (attendance.getId() != null && attendance.getStatus() == status) {
+            throw new BusinessException("Attendance is already marked as " + status + " for this date");
+        }
         attendance.setStudent(student);
         attendance.setAttendanceDate(attendanceDate);
         attendance.setStatus(status);
@@ -117,6 +123,13 @@ public class WardenService {
 
     public List<Attendance> attendance() {
         return attendanceRepository.findAllByOrderByAttendanceDateDesc();
+    }
+
+    public List<Attendance> attendance(LocalDate date) {
+        if (date == null) {
+            return attendance();
+        }
+        return attendanceRepository.findByDateForWarden(date);
     }
 
     public List<LeaveRequest> leaveRequests() {

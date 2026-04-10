@@ -13,6 +13,9 @@ public final class Requests {
     public record TextRequest(String value) {
     }
 
+    public record LeaveRequestPayload(String reason, LocalDate startDate, LocalDate endDate) {
+    }
+
     public record RoomRequest(String roomNumber, int capacity, String status) {
     }
 
@@ -23,5 +26,8 @@ public final class Requests {
     }
 
     public record BillRequest(Long studentId, BigDecimal amount) {
+    }
+
+    public record AttendanceSummary(long totalDays, long presentDays, long absentDays, double percentage) {
     }
 }

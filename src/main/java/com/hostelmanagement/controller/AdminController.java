@@ -7,6 +7,7 @@ import com.hostelmanagement.model.Bill;
 import com.hostelmanagement.model.Room;
 import com.hostelmanagement.model.RoomStatus;
 import com.hostelmanagement.model.User;
+import com.hostelmanagement.model.Payment;
 import com.hostelmanagement.service.AdminService;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -58,6 +59,11 @@ public class AdminController {
     @GetMapping("/bills")
     public List<Bill> bills() {
         return adminService.bills();
+    }
+
+    @GetMapping("/payments")
+    public List<Payment> payments() {
+        return adminService.payments();
     }
 
     @GetMapping("/students")

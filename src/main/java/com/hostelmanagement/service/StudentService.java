@@ -9,6 +9,8 @@ import com.hostelmanagement.model.LeaveRequest;
 import com.hostelmanagement.model.Payment;
 import com.hostelmanagement.model.User;
 import com.hostelmanagement.model.UserRole;
+import com.hostelmanagement.model.AttendanceStatus;
+import com.hostelmanagement.dto.Requests.AttendanceSummary;
 import com.hostelmanagement.repository.ApplicationRepository;
 import com.hostelmanagement.repository.AttendanceRepository;
 import com.hostelmanagement.repository.BillRepository;
@@ -20,6 +22,8 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 @Service
 public class StudentService {
@@ -49,16 +53,28 @@ public class StudentService {
 
     public Application apply(Long studentId) {
         User student = student(studentId);
+        if (applicationRepository.existsByStudentId(studentId)) {
+            throw new BusinessException("You have already applied");
+        }
         Application application = new Application();
         application.setStudent(student);
         return applicationRepository.save(application);
     }
 
-    public LeaveRequest requestLeave(Long studentId, String reason) {
+    public LeaveRequest requestLeave(Long studentId, String reason, LocalDate startDate, LocalDate endDate) {
         requireText(reason, "Leave reason is required");
+        if (startDate == null || endDate == null) {
+            throw new BusinessException("Start date and end date are required");
+        }
+        if (endDate.isBefore(startDate)) {
+            throw new BusinessException("End date cannot be before start date");
+        }
         LeaveRequest request = new LeaveRequest();
         request.setStudent(student(studentId));
         request.setReason(reason.trim());
+        request.setStartDate(startDate);
+        request.setEndDate(endDate);
+        request.setTotalDays((int) ChronoUnit.DAYS.between(startDate, endDate) + 1);
         return leaveRequestRepository.save(request);
     }
 
@@ -95,6 +111,15 @@ public class StudentService {
 
     public List<Attendance> attendance(Long studentId) {
         return attendanceRepository.findByStudentIdOrderByAttendanceDateDesc(studentId);
+    }
+
+    public AttendanceSummary attendanceSummary(Long studentId) {
+        List<Attendance> records = attendance(studentId);
+        long presentDays = records.stream().filter(record -> record.getStatus() == AttendanceStatus.PRESENT).count();
+        long absentDays = records.stream().filter(record -> record.getStatus() == AttendanceStatus.ABSENT).count();
+        long totalDays = records.size();
+        double percentage = totalDays == 0 ? 0 : Math.round((presentDays * 10000.0 / totalDays)) / 100.0;
+        return new AttendanceSummary(totalDays, presentDays, absentDays, percentage);
     }
 
     public List<LeaveRequest> leaveRequests(Long studentId) {

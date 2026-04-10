@@ -19,6 +19,7 @@ import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import com.hostelmanagement.model.Payment;
 
 @Service
 public class AdminService {
@@ -91,6 +92,10 @@ public class AdminService {
 
     public List<Bill> bills() {
         return billRepository.findAllByOrderByCreatedAtDesc();
+    }
+
+    public List<Payment> payments() {
+        return paymentRepository.findAllByOrderByPaidAtDesc();
     }
 
     public List<User> students() {

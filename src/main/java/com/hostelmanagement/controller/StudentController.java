@@ -1,6 +1,8 @@
 package com.hostelmanagement.controller;
 
 import com.hostelmanagement.dto.ApiResponse;
+import com.hostelmanagement.dto.Requests.AttendanceSummary;
+import com.hostelmanagement.dto.Requests.LeaveRequestPayload;
 import com.hostelmanagement.dto.Requests.TextRequest;
 import com.hostelmanagement.model.Application;
 import com.hostelmanagement.model.Attendance;
@@ -38,8 +40,8 @@ public class StudentController {
     }
 
     @PostMapping("/leave-requests")
-    public LeaveRequest requestLeave(@PathVariable Long studentId, @RequestBody TextRequest request) {
-        return studentService.requestLeave(studentId, request.value());
+    public LeaveRequest requestLeave(@PathVariable Long studentId, @RequestBody LeaveRequestPayload request) {
+        return studentService.requestLeave(studentId, request.reason(), request.startDate(), request.endDate());
     }
 
     @GetMapping("/leave-requests")
@@ -60,6 +62,11 @@ public class StudentController {
     @GetMapping("/attendance")
     public List<Attendance> attendance(@PathVariable Long studentId) {
         return studentService.attendance(studentId);
+    }
+
+    @GetMapping("/attendance/summary")
+    public AttendanceSummary attendanceSummary(@PathVariable Long studentId) {
+        return studentService.attendanceSummary(studentId);
     }
 
     @GetMapping("/bills")

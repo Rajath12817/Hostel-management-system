@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS applications (
     student_id BIGINT NOT NULL,
     status ENUM('PENDING', 'APPROVED', 'REJECTED') NOT NULL,
     created_at DATETIME NOT NULL,
+    CONSTRAINT uk_application_student UNIQUE (student_id),
     CONSTRAINT fk_app_student FOREIGN KEY (student_id) REFERENCES users(id)
 );
 
@@ -47,6 +48,9 @@ CREATE TABLE IF NOT EXISTS leave_requests (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     student_id BIGINT NOT NULL,
     reason VARCHAR(1000) NOT NULL,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    total_days INT NOT NULL,
     status ENUM('PENDING', 'APPROVED', 'REJECTED') NOT NULL,
     created_at DATETIME NOT NULL,
     CONSTRAINT fk_leave_student FOREIGN KEY (student_id) REFERENCES users(id)
