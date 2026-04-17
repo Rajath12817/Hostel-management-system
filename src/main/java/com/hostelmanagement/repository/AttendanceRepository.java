@@ -18,4 +18,6 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
     List<Attendance> findByDateForWarden(@Param("date") LocalDate attendanceDate);
 
     Optional<Attendance> findByStudentIdAndAttendanceDate(Long studentId, LocalDate attendanceDate);
+
+    boolean existsByStudentIdAndAttendanceDate(Long studentId, LocalDate attendanceDate);
 }

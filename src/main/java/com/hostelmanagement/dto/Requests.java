@@ -3,29 +3,33 @@ package com.hostelmanagement.dto;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+
 public final class Requests {
     private Requests() {
     }
 
-    public record LoginRequest(String email, String password) {
+    public record LoginRequest(@NotBlank String email, @NotBlank String password) {
     }
 
-    public record TextRequest(String value) {
+    public record TextRequest(@NotBlank String value) {
     }
 
-    public record LeaveRequestPayload(String reason, LocalDate startDate, LocalDate endDate) {
+    public record LeaveRequestPayload(@NotBlank String reason, @NotNull LocalDate startDate, @NotNull LocalDate endDate) {
     }
 
-    public record RoomRequest(String roomNumber, int capacity, String status) {
+    public record RoomRequest(@NotBlank String roomNumber, @Positive int capacity, @NotBlank String status) {
     }
 
-    public record AllocationRequest(Long studentId, Long roomId) {
+    public record AllocationRequest(@NotNull Long studentId, @NotNull Long roomId) {
     }
 
-    public record AttendanceRequest(Long studentId, LocalDate date, String status) {
+    public record AttendanceRequest(@NotNull Long studentId, LocalDate date, @NotBlank String status) {
     }
 
-    public record BillRequest(Long studentId, BigDecimal amount) {
+    public record BillRequest(@NotNull Long studentId, @NotNull BigDecimal amount) {
     }
 
     public record AttendanceSummary(long totalDays, long presentDays, long absentDays, double percentage) {

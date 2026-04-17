@@ -281,7 +281,7 @@ async function renderStudent(key) {
             Api.get(`/api/student/${user.id}/attendance`),
             Api.get(`/api/student/${user.id}/complaints`),
             Api.get(`/api/student/${user.id}/bills`),
-            Api.get(`/attendance/summary/${user.id}`)
+            Api.get(`/api/student/${user.id}/attendance/summary`)
         ]);
         const alreadyApplied = apps.length > 0;
         content.innerHTML = metrics([["Applications", apps.length], ["Attendance %", summary.percentage], ["Complaints", complaints.length], ["Unpaid Bills", bills.filter((bill) => bill.status === "UNPAID").length]]) +
@@ -306,7 +306,7 @@ async function renderStudent(key) {
         setTitle("My Attendance");
         const [rows, summary] = await Promise.all([
             Api.get(`/api/student/${user.id}/attendance`),
-            Api.get(`/attendance/summary/${user.id}`)
+            Api.get(`/api/student/${user.id}/attendance/summary`)
         ]);
         content.innerHTML = attendanceSummaryBlock(summary) + panel("Attendance", table(["Date", "Status"], rows.map((row) => `<tr class="${row.status === "PRESENT" ? "attendance-present" : "attendance-absent"}" title="${row.status} on ${formatDate(row.attendanceDate)}"><td>${formatDate(row.attendanceDate)}</td><td>${statusBadge(row.status)}</td></tr>`)));
         return;
@@ -378,7 +378,7 @@ async function renderWarden(key) {
     }
     if (key === "allocations") {
         setTitle("Room Allocations");
-        const [students, rooms, allocations] = await Promise.all([Api.get("/api/warden/students"), Api.get("/api/warden/rooms/available"), Api.get("/api/warden/allocations")]);
+        const [students, rooms, allocations] = await Promise.all([Api.get("/api/warden/students/allocatable"), Api.get("/api/warden/rooms/available"), Api.get("/api/warden/allocations")]);
         content.innerHTML = panel("Allocate Room", `<form id="allocationForm" class="row g-3"><div class="col-md-5">${select("allocationStudent", students, "Select student", (row) => row.name)}</div><div class="col-md-5">${select("allocationRoom", rooms, "Select room", (row) => `${row.roomNumber} (${row.capacity} beds)`)}</div><div class="col-md-2"><button class="btn btn-primary w-100">Allocate</button></div></form>`) +
             panel("Allocations", table(["Student", "Room", "Allocated At", "Action"], allocations.map((row) => `<tr><td>${escapeHtml(row.student.name)}</td><td>${escapeHtml(row.room.roomNumber)}</td><td>${formatDate(row.allocatedAt)}</td><td>${viewButton({title: "Allocation", Student: row.student.name, Room: row.room.roomNumber, Date: formatDate(row.allocatedAt)})}</td></tr>`)));
         document.getElementById("allocationForm").addEventListener("submit", (event) => safe(async () => {
@@ -392,7 +392,7 @@ async function renderWarden(key) {
     if (key === "attendance") {
         setTitle("Attendance");
         const today = new Date().toISOString().slice(0, 10);
-        const [students, rows] = await Promise.all([Api.get("/api/warden/students"), Api.get(`/api/warden/attendance?date=${today}`)]);
+        const [students, rows] = await Promise.all([Api.get("/api/warden/students/approved"), Api.get(`/api/warden/attendance?date=${today}`)]);
         const attendanceRows = (items) => table(["Student", "Date", "Status"], items.map((row) => `<tr class="${row.status === "PRESENT" ? "attendance-present" : "attendance-absent"}" title="${row.student.name} was ${row.status} on ${formatDate(row.attendanceDate)}"><td>${escapeHtml(row.student.name)}</td><td>${formatDate(row.attendanceDate)}</td><td>${statusBadge(row.status)}</td></tr>`));
         content.innerHTML = panel("Mark Attendance", `<form id="attendanceForm" class="row g-3"><div class="col-md-4">${select("attendanceStudent", students, "Select student", (row) => row.name)}</div><div class="col-md-3"><input id="attendanceDate" type="date" class="form-control" value="${today}"></div><div class="col-md-3"><select id="attendanceStatus" class="form-select" required><option value="" disabled selected>Select status</option><option>PRESENT</option><option>ABSENT</option></select></div><div class="col-md-2"><button class="btn btn-primary w-100">Mark</button></div></form>`) +
             panel("Attendance Records", `<div id="attendanceTableHost">${attendanceRows(rows)}</div>`);
@@ -441,23 +441,24 @@ async function renderAdmin(key) {
     if (key === "rooms") {
         setTitle("Rooms");
         const rooms = await Api.get("/api/admin/rooms");
-        content.innerHTML = panel("Add Room", `<form id="roomForm" class="row g-3"><input type="hidden" id="roomId"><div class="col-md-3"><input id="roomNumber" class="form-control" placeholder="Room number" required></div><div class="col-md-3"><input id="roomCapacity" type="number" min="1" class="form-control" placeholder="Capacity" required></div><div class="col-md-3"><select id="roomStatus" class="form-select"><option>AVAILABLE</option><option>OCCUPIED</option><option>MAINTENANCE</option></select></div><div class="col-md-3"><button class="btn btn-primary w-100" id="roomSubmit">Save Room</button></div></form>`) +
+        let editingRoomId = null;
+        content.innerHTML = panel("Add Room", `<form id="roomForm" class="row g-3"><div class="col-md-3"><input id="roomNumber" class="form-control" placeholder="Room number" required></div><div class="col-md-3"><input id="roomCapacity" type="number" min="1" class="form-control" placeholder="Capacity" required></div><div class="col-md-3"><select id="roomStatus" class="form-select"><option>AVAILABLE</option><option>OCCUPIED</option><option>MAINTENANCE</option></select></div><div class="col-md-3"><button class="btn btn-primary w-100" id="roomSubmit">Save Room</button></div></form>`) +
             panel("Rooms", table(["Room", "Capacity", "Status", "Action"], rooms.map((room) => `<tr><td>${escapeHtml(room.roomNumber)}</td><td>${room.capacity}</td><td>${statusBadge(room.status)}</td><td>${actions([viewButton({title: "Room", Room: room.roomNumber, Capacity: room.capacity, Status: room.status}), `<button class="btn btn-sm btn-outline-primary" data-edit-id="${room.id}" data-edit-number="${escapeHtml(room.roomNumber)}" data-edit-capacity="${room.capacity}" data-edit-status="${room.status}">Edit</button>`, `<button class="btn btn-sm btn-outline-danger" data-delete-room="${room.id}">Delete</button>`])}</td></tr>`)));
         document.getElementById("roomForm").addEventListener("submit", (event) => safe(async () => {
             event.preventDefault();
-            const roomId = document.getElementById("roomId").value;
             const payload = {roomNumber: document.getElementById("roomNumber").value, capacity: Number(document.getElementById("roomCapacity").value), status: document.getElementById("roomStatus").value};
-            if (roomId) {
-                await Api.put(`/api/admin/rooms/${roomId}`, payload);
+            if (editingRoomId) {
+                await Api.put(`/api/admin/rooms/${editingRoomId}`, payload);
                 toast("Room updated");
             } else {
                 await Api.post("/api/admin/rooms", payload);
                 toast("Room created");
             }
+            editingRoomId = null;
             await render("rooms");
         }));
         content.querySelectorAll("[data-edit-id]").forEach((button) => button.addEventListener("click", () => {
-            document.getElementById("roomId").value = button.dataset.editId;
+            editingRoomId = button.dataset.editId;
             document.getElementById("roomNumber").value = button.dataset.editNumber;
             document.getElementById("roomCapacity").value = button.dataset.editCapacity;
             document.getElementById("roomStatus").value = button.dataset.editStatus;

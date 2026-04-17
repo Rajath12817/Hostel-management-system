@@ -11,6 +11,7 @@ import com.hostelmanagement.model.Complaint;
 import com.hostelmanagement.model.LeaveRequest;
 import com.hostelmanagement.model.Payment;
 import com.hostelmanagement.service.StudentService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,7 +41,7 @@ public class StudentController {
     }
 
     @PostMapping("/leave-requests")
-    public LeaveRequest requestLeave(@PathVariable Long studentId, @RequestBody LeaveRequestPayload request) {
+    public LeaveRequest requestLeave(@PathVariable Long studentId, @Valid @RequestBody LeaveRequestPayload request) {
         return studentService.requestLeave(studentId, request.reason(), request.startDate(), request.endDate());
     }
 
@@ -50,7 +51,7 @@ public class StudentController {
     }
 
     @PostMapping("/complaints")
-    public Complaint complaint(@PathVariable Long studentId, @RequestBody TextRequest request) {
+    public Complaint complaint(@PathVariable Long studentId, @Valid @RequestBody TextRequest request) {
         return studentService.raiseComplaint(studentId, request.value());
     }
 

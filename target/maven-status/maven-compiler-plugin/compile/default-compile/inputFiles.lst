@@ -1,4 +1,5 @@
 C:\Works\SEM6\OOAD\hostel management\src\main\java\com\hostelmanagement\config\DataSeeder.java
+C:\Works\SEM6\OOAD\hostel management\src\main\java\com\hostelmanagement\config\PortFallbackConfig.java
 C:\Works\SEM6\OOAD\hostel management\src\main\java\com\hostelmanagement\controller\AdminController.java
 C:\Works\SEM6\OOAD\hostel management\src\main\java\com\hostelmanagement\controller\ApiExceptionHandler.java
 C:\Works\SEM6\OOAD\hostel management\src\main\java\com\hostelmanagement\controller\AttendanceController.java
@@ -34,6 +35,8 @@ C:\Works\SEM6\OOAD\hostel management\src\main\java\com\hostelmanagement\reposito
 C:\Works\SEM6\OOAD\hostel management\src\main\java\com\hostelmanagement\repository\AttendanceRepository.java
 C:\Works\SEM6\OOAD\hostel management\src\main\java\com\hostelmanagement\repository\BillRepository.java
 C:\Works\SEM6\OOAD\hostel management\src\main\java\com\hostelmanagement\repository\ComplaintRepository.java
+C:\Works\SEM6\OOAD\hostel management\src\main\java\com\hostelmanagement\repository\DBConnection.java
+C:\Works\SEM6\OOAD\hostel management\src\main\java\com\hostelmanagement\repository\HostelJdbcRepository.java
 C:\Works\SEM6\OOAD\hostel management\src\main\java\com\hostelmanagement\repository\LeaveRequestRepository.java
 C:\Works\SEM6\OOAD\hostel management\src\main\java\com\hostelmanagement\repository\PaymentRepository.java
 C:\Works\SEM6\OOAD\hostel management\src\main\java\com\hostelmanagement\repository\RoomRepository.java

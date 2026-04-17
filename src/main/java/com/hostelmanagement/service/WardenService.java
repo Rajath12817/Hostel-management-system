@@ -17,6 +17,7 @@ import com.hostelmanagement.repository.AllocationRepository;
 import com.hostelmanagement.repository.ApplicationRepository;
 import com.hostelmanagement.repository.AttendanceRepository;
 import com.hostelmanagement.repository.ComplaintRepository;
+import com.hostelmanagement.repository.HostelJdbcRepository;
 import com.hostelmanagement.repository.LeaveRequestRepository;
 import com.hostelmanagement.repository.RoomRepository;
 import com.hostelmanagement.repository.UserRepository;
@@ -24,6 +25,8 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 @Service
@@ -35,6 +38,7 @@ public class WardenService {
     private final AttendanceRepository attendanceRepository;
     private final LeaveRequestRepository leaveRequestRepository;
     private final ComplaintRepository complaintRepository;
+    private final HostelJdbcRepository hostelJdbcRepository;
 
     public WardenService(UserRepository userRepository,
                          RoomRepository roomRepository,
@@ -42,7 +46,8 @@ public class WardenService {
                          AllocationRepository allocationRepository,
                          AttendanceRepository attendanceRepository,
                          LeaveRequestRepository leaveRequestRepository,
-                         ComplaintRepository complaintRepository) {
+                         ComplaintRepository complaintRepository,
+                         HostelJdbcRepository hostelJdbcRepository) {
         this.userRepository = userRepository;
         this.roomRepository = roomRepository;
         this.applicationRepository = applicationRepository;
@@ -50,6 +55,7 @@ public class WardenService {
         this.attendanceRepository = attendanceRepository;
         this.leaveRequestRepository = leaveRequestRepository;
         this.complaintRepository = complaintRepository;
+        this.hostelJdbcRepository = hostelJdbcRepository;
     }
 
     public List<Application> applications() {
@@ -94,11 +100,11 @@ public class WardenService {
             throw new BusinessException("Attendance status is required");
         }
         LocalDate attendanceDate = date == null ? LocalDate.now() : date;
-        Attendance attendance = attendanceRepository.findByStudentIdAndAttendanceDate(studentId, attendanceDate)
-                .orElseGet(Attendance::new);
-        if (attendance.getId() != null && attendance.getStatus() == status) {
-            throw new BusinessException("Attendance is already marked as " + status + " for this date");
+        if (attendanceRepository.existsByStudentIdAndAttendanceDate(studentId, attendanceDate)
+                || hostelJdbcRepository.attendanceExists(studentId, attendanceDate)) {
+            throw new BusinessException("Attendance is already marked for this student on this date");
         }
+        Attendance attendance = new Attendance();
         attendance.setStudent(student);
         attendance.setAttendanceDate(attendanceDate);
         attendance.setStatus(status);
@@ -141,7 +147,20 @@ public class WardenService {
     }
 
     public List<User> students() {
-        return userRepository.findByRoleOrderByName(UserRole.STUDENT);
+        List<User> approved = userRepository.findApprovedStudents();
+        List<User> allocated = allocationRepository.findAllocatedStudents();
+        LinkedHashMap<Long, User> merged = new LinkedHashMap<>();
+        approved.forEach(user -> merged.put(user.getId(), user));
+        allocated.forEach(user -> merged.putIfAbsent(user.getId(), user));
+        return new ArrayList<>(merged.values());
+    }
+
+    public List<User> approvedStudents() {
+        return userRepository.findApprovedStudents();
+    }
+
+    public List<User> allocatableStudents() {
+        return userRepository.findAllocatableStudents();
     }
 
     public List<Room> availableRooms() {

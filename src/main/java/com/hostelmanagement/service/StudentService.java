@@ -15,6 +15,7 @@ import com.hostelmanagement.repository.ApplicationRepository;
 import com.hostelmanagement.repository.AttendanceRepository;
 import com.hostelmanagement.repository.BillRepository;
 import com.hostelmanagement.repository.ComplaintRepository;
+import com.hostelmanagement.repository.HostelJdbcRepository;
 import com.hostelmanagement.repository.LeaveRequestRepository;
 import com.hostelmanagement.repository.PaymentRepository;
 import com.hostelmanagement.repository.UserRepository;
@@ -34,6 +35,7 @@ public class StudentService {
     private final ComplaintRepository complaintRepository;
     private final BillRepository billRepository;
     private final PaymentRepository paymentRepository;
+    private final HostelJdbcRepository hostelJdbcRepository;
 
     public StudentService(UserRepository userRepository,
                           ApplicationRepository applicationRepository,
@@ -41,7 +43,8 @@ public class StudentService {
                           LeaveRequestRepository leaveRequestRepository,
                           ComplaintRepository complaintRepository,
                           BillRepository billRepository,
-                          PaymentRepository paymentRepository) {
+                          PaymentRepository paymentRepository,
+                          HostelJdbcRepository hostelJdbcRepository) {
         this.userRepository = userRepository;
         this.applicationRepository = applicationRepository;
         this.attendanceRepository = attendanceRepository;
@@ -49,11 +52,12 @@ public class StudentService {
         this.complaintRepository = complaintRepository;
         this.billRepository = billRepository;
         this.paymentRepository = paymentRepository;
+        this.hostelJdbcRepository = hostelJdbcRepository;
     }
 
     public Application apply(Long studentId) {
         User student = student(studentId);
-        if (applicationRepository.existsByStudentId(studentId)) {
+        if (applicationRepository.existsByStudentId(studentId) || hostelJdbcRepository.applicationExists(studentId)) {
             throw new BusinessException("You have already applied");
         }
         Application application = new Application();

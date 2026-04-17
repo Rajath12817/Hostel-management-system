@@ -13,6 +13,7 @@ import com.hostelmanagement.model.LeaveStatus;
 import com.hostelmanagement.model.Room;
 import com.hostelmanagement.model.User;
 import com.hostelmanagement.service.WardenService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -51,7 +52,7 @@ public class WardenController {
     }
 
     @PostMapping("/allocations")
-    public Allocation allocate(@RequestBody AllocationRequest request) {
+    public Allocation allocate(@Valid @RequestBody AllocationRequest request) {
         return wardenService.allocateRoom(request.studentId(), request.roomId());
     }
 
@@ -61,7 +62,7 @@ public class WardenController {
     }
 
     @PostMapping("/attendance")
-    public Attendance attendance(@RequestBody AttendanceRequest request) {
+    public Attendance attendance(@Valid @RequestBody AttendanceRequest request) {
         return wardenService.markAttendance(request.studentId(), request.date(), AttendanceStatus.valueOf(request.status()));
     }
 
@@ -98,6 +99,16 @@ public class WardenController {
     @GetMapping("/students")
     public List<User> students() {
         return wardenService.students();
+    }
+
+    @GetMapping("/students/approved")
+    public List<User> approvedStudents() {
+        return wardenService.approvedStudents();
+    }
+
+    @GetMapping("/students/allocatable")
+    public List<User> allocatableStudents() {
+        return wardenService.allocatableStudents();
     }
 
     @GetMapping("/rooms/available")

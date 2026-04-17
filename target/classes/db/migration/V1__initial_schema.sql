@@ -1,6 +1,3 @@
-CREATE DATABASE IF NOT EXISTS hostel_management;
-USE hostel_management;
-
 CREATE TABLE IF NOT EXISTS users (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     user_type VARCHAR(31) NOT NULL,
@@ -20,7 +17,7 @@ CREATE TABLE IF NOT EXISTS rooms (
 CREATE TABLE IF NOT EXISTS applications (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     student_id BIGINT NOT NULL,
-    status ENUM('PENDING', 'APPROVED', 'REJECTED') NOT NULL,
+    status ENUM('PENDING', 'APPROVED', 'REJECTED') NOT NULL DEFAULT 'PENDING',
     created_at DATETIME NOT NULL,
     CONSTRAINT uk_application_student UNIQUE (student_id),
     CONSTRAINT fk_app_student FOREIGN KEY (student_id) REFERENCES users(id)
@@ -51,7 +48,7 @@ CREATE TABLE IF NOT EXISTS leave_requests (
     start_date DATE NOT NULL,
     end_date DATE NOT NULL,
     total_days INT NOT NULL,
-    status ENUM('PENDING', 'APPROVED', 'REJECTED') NOT NULL,
+    status ENUM('PENDING', 'APPROVED', 'REJECTED') NOT NULL DEFAULT 'PENDING',
     created_at DATETIME NOT NULL,
     CONSTRAINT chk_leave_dates CHECK (end_date >= start_date),
     CONSTRAINT fk_leave_student FOREIGN KEY (student_id) REFERENCES users(id)
@@ -61,7 +58,7 @@ CREATE TABLE IF NOT EXISTS complaints (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     student_id BIGINT NOT NULL,
     description VARCHAR(1000) NOT NULL,
-    status ENUM('OPEN', 'IN_PROGRESS', 'RESOLVED') NOT NULL,
+    status ENUM('OPEN', 'IN_PROGRESS', 'RESOLVED') NOT NULL DEFAULT 'OPEN',
     created_at DATETIME NOT NULL,
     CONSTRAINT fk_complaint_student FOREIGN KEY (student_id) REFERENCES users(id)
 );
@@ -70,7 +67,7 @@ CREATE TABLE IF NOT EXISTS bills (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     student_id BIGINT NOT NULL,
     amount DECIMAL(10, 2) NOT NULL,
-    status ENUM('UNPAID', 'PAID') NOT NULL,
+    status ENUM('UNPAID', 'PAID') NOT NULL DEFAULT 'UNPAID',
     created_at DATETIME NOT NULL,
     CONSTRAINT fk_bill_student FOREIGN KEY (student_id) REFERENCES users(id)
 );

@@ -1,0 +1,2 @@
+Stop-Process -Id 33828
+mvn spring-boot:run
