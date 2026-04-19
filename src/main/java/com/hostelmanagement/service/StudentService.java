@@ -19,12 +19,12 @@ import com.hostelmanagement.repository.HostelJdbcRepository;
 import com.hostelmanagement.repository.LeaveRequestRepository;
 import com.hostelmanagement.repository.PaymentRepository;
 import com.hostelmanagement.repository.UserRepository;
+import com.hostelmanagement.service.payment.PaymentService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 
 @Service
 public class StudentService {
@@ -36,6 +36,7 @@ public class StudentService {
     private final BillRepository billRepository;
     private final PaymentRepository paymentRepository;
     private final HostelJdbcRepository hostelJdbcRepository;
+    private final PaymentService paymentService;
 
     public StudentService(UserRepository userRepository,
                           ApplicationRepository applicationRepository,
@@ -44,7 +45,8 @@ public class StudentService {
                           ComplaintRepository complaintRepository,
                           BillRepository billRepository,
                           PaymentRepository paymentRepository,
-                          HostelJdbcRepository hostelJdbcRepository) {
+                          HostelJdbcRepository hostelJdbcRepository,
+                          PaymentService paymentService) {
         this.userRepository = userRepository;
         this.applicationRepository = applicationRepository;
         this.attendanceRepository = attendanceRepository;
@@ -53,6 +55,7 @@ public class StudentService {
         this.billRepository = billRepository;
         this.paymentRepository = paymentRepository;
         this.hostelJdbcRepository = hostelJdbcRepository;
+        this.paymentService = paymentService;
     }
 
     public Application apply(Long studentId) {
@@ -78,7 +81,6 @@ public class StudentService {
         request.setReason(reason.trim());
         request.setStartDate(startDate);
         request.setEndDate(endDate);
-        request.setTotalDays((int) ChronoUnit.DAYS.between(startDate, endDate) + 1);
         return leaveRequestRepository.save(request);
     }
 
@@ -100,11 +102,12 @@ public class StudentService {
         if (bill.getStatus() == BillStatus.PAID) {
             throw new BusinessException("Bill is already paid");
         }
-        bill.setStatus(BillStatus.PAID);
+        paymentService.pay(bill.getAmount().doubleValue());
         Payment payment = new Payment();
         payment.setStudent(student);
         payment.setBill(bill);
         payment.setAmount(bill.getAmount());
+        bill.setStatus(BillStatus.PAID);
         billRepository.save(bill);
         return paymentRepository.save(payment);
     }

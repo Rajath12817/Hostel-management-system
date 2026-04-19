@@ -26,7 +26,7 @@ public final class Requests {
     public record AllocationRequest(@NotNull Long studentId, @NotNull Long roomId) {
     }
 
-    public record AttendanceRequest(@NotNull Long studentId, LocalDate date, @NotBlank String status) {
+    public record AttendanceRequest(@NotNull Long studentId, @NotNull LocalDate date, @NotBlank String status) {
     }
 
     public record BillRequest(@NotNull Long studentId, @NotNull BigDecimal amount) {

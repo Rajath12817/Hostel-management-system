@@ -265,6 +265,14 @@ function attendanceSummaryBlock(summary) {
         panel("Attendance Progress", `<div class="progress" style="height: 16px;"><div class="progress-bar bg-success" role="progressbar" style="width: ${summary.percentage}%">${summary.percentage}%</div></div><p class="text-muted mt-2 mb-0">Based on ${summary.totalDays} marked day${summary.totalDays === 1 ? "" : "s"}.</p>`);
 }
 
+function summarizeAttendanceRows(rows) {
+    const presentDays = rows.filter((row) => row.status === "PRESENT").length;
+    const absentDays = rows.filter((row) => row.status === "ABSENT").length;
+    const totalDays = rows.length;
+    const percentage = totalDays === 0 ? 0 : Math.round((presentDays * 10000) / totalDays) / 100;
+    return {totalDays, presentDays, absentDays, percentage};
+}
+
 function leaveDays(startDate, endDate) {
     if (!startDate || !endDate) return 0;
     const start = new Date(`${startDate}T00:00:00`);
@@ -394,13 +402,17 @@ async function renderWarden(key) {
         const today = new Date().toISOString().slice(0, 10);
         const [students, rows] = await Promise.all([Api.get("/api/warden/students/approved"), Api.get(`/api/warden/attendance?date=${today}`)]);
         const attendanceRows = (items) => table(["Student", "Date", "Status"], items.map((row) => `<tr class="${row.status === "PRESENT" ? "attendance-present" : "attendance-absent"}" title="${row.student.name} was ${row.status} on ${formatDate(row.attendanceDate)}"><td>${escapeHtml(row.student.name)}</td><td>${formatDate(row.attendanceDate)}</td><td>${statusBadge(row.status)}</td></tr>`));
-        content.innerHTML = panel("Mark Attendance", `<form id="attendanceForm" class="row g-3"><div class="col-md-4">${select("attendanceStudent", students, "Select student", (row) => row.name)}</div><div class="col-md-3"><input id="attendanceDate" type="date" class="form-control" value="${today}"></div><div class="col-md-3"><select id="attendanceStatus" class="form-select" required><option value="" disabled selected>Select status</option><option>PRESENT</option><option>ABSENT</option></select></div><div class="col-md-2"><button class="btn btn-primary w-100">Mark</button></div></form>`) +
+        const summary = summarizeAttendanceRows(rows);
+        content.innerHTML = `<div id="wardenAttendanceSummary">${attendanceSummaryBlock(summary)}</div>` +
+            panel("Mark Attendance", `<form id="attendanceForm" class="row g-3"><div class="col-md-4">${select("attendanceStudent", students, "Select student", (row) => row.name)}</div><div class="col-md-3"><input id="attendanceDate" type="date" class="form-control" value="${today}"></div><div class="col-md-3"><select id="attendanceStatus" class="form-select" required><option value="" disabled selected>Select status</option><option>PRESENT</option><option>ABSENT</option></select></div><div class="col-md-2"><button class="btn btn-primary w-100">Mark</button></div></form>`) +
             panel("Attendance Records", `<div id="attendanceTableHost">${attendanceRows(rows)}</div>`);
         const reloadDateAttendance = async () => {
             const date = document.getElementById("attendanceDate").value;
             document.getElementById("attendanceStudent").selectedIndex = 0;
             document.getElementById("attendanceStatus").selectedIndex = 0;
             const records = await Api.get(`/api/warden/attendance?date=${date}`);
+            const nextSummary = summarizeAttendanceRows(records);
+            document.getElementById("wardenAttendanceSummary").innerHTML = attendanceSummaryBlock(nextSummary);
             document.getElementById("attendanceTableHost").innerHTML = attendanceRows(records);
             enhanceTables();
             drawIcons();

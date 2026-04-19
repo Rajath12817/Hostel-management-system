@@ -16,10 +16,12 @@ C:\Works\SEM6\OOAD\hostel management\src\main\java\com\hostelmanagement\model\Ap
 C:\Works\SEM6\OOAD\hostel management\src\main\java\com\hostelmanagement\model\ApplicationStatus.java
 C:\Works\SEM6\OOAD\hostel management\src\main\java\com\hostelmanagement\model\Attendance.java
 C:\Works\SEM6\OOAD\hostel management\src\main\java\com\hostelmanagement\model\AttendanceStatus.java
+C:\Works\SEM6\OOAD\hostel management\src\main\java\com\hostelmanagement\model\Bed.java
 C:\Works\SEM6\OOAD\hostel management\src\main\java\com\hostelmanagement\model\Bill.java
 C:\Works\SEM6\OOAD\hostel management\src\main\java\com\hostelmanagement\model\BillStatus.java
 C:\Works\SEM6\OOAD\hostel management\src\main\java\com\hostelmanagement\model\Complaint.java
 C:\Works\SEM6\OOAD\hostel management\src\main\java\com\hostelmanagement\model\ComplaintStatus.java
+C:\Works\SEM6\OOAD\hostel management\src\main\java\com\hostelmanagement\model\Hostel.java
 C:\Works\SEM6\OOAD\hostel management\src\main\java\com\hostelmanagement\model\LeaveRequest.java
 C:\Works\SEM6\OOAD\hostel management\src\main\java\com\hostelmanagement\model\LeaveStatus.java
 C:\Works\SEM6\OOAD\hostel management\src\main\java\com\hostelmanagement\model\Payment.java
@@ -45,6 +47,9 @@ C:\Works\SEM6\OOAD\hostel management\src\main\java\com\hostelmanagement\service\
 C:\Works\SEM6\OOAD\hostel management\src\main\java\com\hostelmanagement\service\AuthService.java
 C:\Works\SEM6\OOAD\hostel management\src\main\java\com\hostelmanagement\service\BusinessException.java
 C:\Works\SEM6\OOAD\hostel management\src\main\java\com\hostelmanagement\service\NotFoundException.java
+C:\Works\SEM6\OOAD\hostel management\src\main\java\com\hostelmanagement\service\payment\ExternalPaymentGateway.java
+C:\Works\SEM6\OOAD\hostel management\src\main\java\com\hostelmanagement\service\payment\PaymentAdapter.java
+C:\Works\SEM6\OOAD\hostel management\src\main\java\com\hostelmanagement\service\payment\PaymentService.java
 C:\Works\SEM6\OOAD\hostel management\src\main\java\com\hostelmanagement\service\ReceiptService.java
 C:\Works\SEM6\OOAD\hostel management\src\main\java\com\hostelmanagement\service\StudentService.java
 C:\Works\SEM6\OOAD\hostel management\src\main\java\com\hostelmanagement\service\WardenService.java
